@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: xenia-db
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=xenia
+      - POSTGRES_PASSWORD=maranata
+      - POSTGRES_DB=xenia_db
+    volumes:
+      - xenia_database:/var/lib/postgresql/data
+
+volumes:
+  xenia_database:
