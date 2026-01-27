@@ -5,11 +5,16 @@ import com.maranata.xenia.model.VolunteerRequestDTO;
 import com.maranata.xenia.model.VolunteerResponseDTO;
 import com.maranata.xenia.repository.VolunteerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class VolunteerService {
@@ -49,9 +54,33 @@ public class VolunteerService {
        );
     }
 
-    public VolunteerResponseDTO deleteVolunteerByName(String name) {
-        Volunteer volunteer = repository.deleteByName(name)
+    public VolunteerResponseDTO getVolunteerById(UUID id) {
+        Volunteer volunteer = repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Volunteer not found."));
+
+        return new VolunteerResponseDTO(
+                volunteer.getId(),
+                volunteer.getName(),
+                volunteer.getRole()
+        );
+    }
+
+    public List<VolunteerResponseDTO> getVolunteers(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Volunteer> volunteersList = this.repository.findAll(pageable);
+
+        return volunteersList.map(volunteer -> new VolunteerResponseDTO(
+                volunteer.getId(),
+                volunteer.getName(),
+                volunteer.getRole())
+            ).stream().toList();
+    }
+
+    public VolunteerResponseDTO deleteVolunteerById(UUID id) {
+        Volunteer volunteer = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Volunteer not found."));
+
+        repository.delete(volunteer);
 
         return new VolunteerResponseDTO(
                 volunteer.getId(),
