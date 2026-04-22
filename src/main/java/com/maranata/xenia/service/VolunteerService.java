@@ -1,5 +1,6 @@
 package com.maranata.xenia.service;
 
+import com.maranata.xenia.exception.ResourceAlreadyExistsException;
 import com.maranata.xenia.model.Volunteer;
 import com.maranata.xenia.model.VolunteerRequestDTO;
 import com.maranata.xenia.model.VolunteerResponseDTO;
@@ -26,6 +27,11 @@ public class VolunteerService {
     private VolunteerRepository repository;
 
     public VolunteerResponseDTO createVolunteer(VolunteerRequestDTO volunteerRequest) {
+
+        if (repository.existsByName(volunteerRequest.name())) {
+            // Create an exception to throw HTTP 400 (Bad Request) or 409 (Conflict).
+            throw new ResourceAlreadyExistsException("There are already an volunteer with this name.");
+        }
 
         Volunteer newVolunteer = new Volunteer();
 
@@ -65,7 +71,14 @@ public class VolunteerService {
         );
     }
 
-    public List<VolunteerResponseDTO> getVolunteers(int page, int size) {
+    public Volunteer getVolunteerEntityById(UUID id) {
+
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Volunteer not found."));
+
+    }
+
+    public Page<VolunteerResponseDTO> getVolunteers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Volunteer> volunteersList = this.repository.findAll(pageable);
 
@@ -73,7 +86,7 @@ public class VolunteerService {
                 volunteer.getId(),
                 volunteer.getName(),
                 volunteer.getRole())
-            ).stream().toList();
+            );
     }
 
     public VolunteerResponseDTO deleteVolunteerById(UUID id) {

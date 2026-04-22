@@ -10,5 +10,7 @@ public interface VolunteerRepository extends JpaRepository<Volunteer, UUID> {
 
     Optional<Volunteer> findByName(String name);
 
+    Boolean existsByName(String name);
+
 }
 
