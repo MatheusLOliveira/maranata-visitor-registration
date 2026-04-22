@@ -1,6 +1,11 @@
 package com.maranata.xenia.model.dto;
 
-public record VisitorResponseDTO(
+import java.util.UUID;
 
+public record VisitorResponseDTO(
+        String name,
+        String phone,
+        Integer age,
+        UUID responsibleVolunteer
 ) {
 }

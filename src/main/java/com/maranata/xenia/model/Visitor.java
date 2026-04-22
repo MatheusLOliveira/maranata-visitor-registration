@@ -42,6 +42,4 @@ public class Visitor {
     @Enumerated(EnumType.STRING)
     private VisitorStatus visitorStatus;
 
-
-
 }
